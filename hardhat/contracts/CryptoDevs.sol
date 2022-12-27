@@ -21,25 +21,25 @@ contract CryptoDevs is ERC721Enumerable, Ownable{
   
   bool public presaleStarted;
   
-  uint256 public presaledEnded;
+  uint256 public presaleEnded;
 
   modifier onlyWhenNotPaused{
-    require(!_pause, "Contract currently paused");
+    require(!_paused, "Contract currently paused");
     _;
   }
 
-  constructor (string memory baseUri, address whitelistContract) ERC721("Crypto Devs, CD"){
+  constructor (string memory baseUri, address whitelistContract) ERC721("Crypto Devs", "CD"){
     _baseTokenURI = baseUri;
     whitelist = IWhitelist(whitelistContract);
   }
 
   function startPresale() public onlyOwner {
     presaleStarted = true;
-    presaledEnded = block.timestamp + 5 minutes;
+    presaleEnded = block.timestamp + 5 minutes;
   }
 
   function presaleMint() public payable onlyWhenNotPaused{
-    require(presaleStarted && block.timestamp < presaledEnded, "Presale is not running");
+    require(presaleStarted && block.timestamp < presaleEnded, "Presale is not running");
     require(tokensIds < maxTokensIds, "Exceed maximum Crypto Devs supply");
     require(msg.value >= _price, "Ether sent is not correct");
     tokensIds +=1;
@@ -47,8 +47,8 @@ contract CryptoDevs is ERC721Enumerable, Ownable{
   }
 
   function mint() public payable onlyWhenNotPaused{
-    require(presaleStarted && block.timestamp >= presaledEnded, "Presale has not ended);
-    require(tokensIds < maxTokensIds, "Exceed maximum Crypto Devs supply);
+    require(presaleStarted && block.timestamp >= presaleEnded, "Presale has not ended");
+    require(tokensIds < maxTokensIds, "Exceed maximum Crypto Devs supply");
     require(msg.value >= _price, "Ether sent is not correct");
     tokensIds += 1;
     _safeMint(msg.sender, tokensIds);
